@@ -1,0 +1,25 @@
+# Prompt for username 
+$userName = Read-Host "Enter username of the user to offboard:"
+
+# Import necessary modules 
+Import-Module ActiveDirectory
+
+# Disable the user account
+Disable-ADUser -Identity $userName -Confirm:$false
+
+# Reset password 
+Set-ADAccountPassword -Identity $userName -NewPassword (ConvertTo-SecureString "Reset!123" -AsPlainText -Force) -Reset:$true
+
+# Remove user from security groups 
+Remove-ADGroupMember -Member $userName -GroupName "Domain Users"
+Remove-ADGroupMember -Member $userName -GroupName "Employees"
+
+# (Optional) Disable/convert mailbox 
+# Set-Mailbox -Identity $userName -InactiveMailbox -Confirm:$false
+
+# (Optional) Forward emails 
+# Set-Mailbox -Identity $userName -ForwardingAddress "someone@example.com" -Confirm:$false
+
+# Write confirmation message
+Write-Host "User account $userName offboarded successfully!"
+
