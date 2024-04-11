@@ -1,0 +1,14 @@
+# Get username 
+$userName = Read-Host "Enter username to disable:" 
+
+# Define target disable date/time 
+$disableDateTime = Get-Date "2024-05-15 10:00:00"  # Replace with attended date and time
+
+# Check if target date/time has passed
+if ($disableDateTime -lt (Get-Date)) {
+  # Disable user account if target date has passed
+  Disable-ADUser -Identity $userName -Confirm:$false
+  Write-Host "User account $userName disabled."
+} else {
+  Write-Host "Target date/time to disable user $userName hasn't arrived yet."
+}
