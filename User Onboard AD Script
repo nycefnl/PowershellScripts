@@ -1,0 +1,37 @@
+# Get user information 
+$firstName = Read-Host "Enter First Name:"
+$lastName = Read-Host "Enter Last Name:"
+$userName = Read-Host "Enter Username:"
+$department = Read-Host "Enter Department:"
+
+# Define password complexity requirements 
+$minPasswordLength = 12
+$requireSymbols = $true
+$requireNumbers = $true
+$requireUppercase = $true
+$requireLowercase = $true
+
+# Validate password complexity
+do {
+  $password = Read-Host "Enter Password (must be at least $minPasswordLength characters and include a symbol, number, uppercase, and lowercase letter):" -AsPlainText
+  if ($password.Length -lt $minPasswordLength -or ($requireSymbols -and -not [System.Text.RegularExpressions.Regex]::IsMatch($password, "[!@#$%^&*()_+=]")) -or ($requireNumbers -and -not [System.Text.RegularExpressions.Regex]::IsMatch($password, "[0-9]")) -or ($requireUppercase -and -not [System.Text.RegularExpressions.Regex]::IsMatch($password, "[A-Z]")) -or ($requireLowercase -and -not [System.Text.RegularExpressions.Regex]::IsMatch($password, "[a-z]"))) {
+    Write-Host "Password does not meet complexity requirements."
+  }
+} while ($password.Length -lt $minPasswordLength -or ($requireSymbols -and -not [System.Text.RegularExpressions.Regex]::IsMatch($password, "[!@#$%^&*()_+=]")) -or ($requireNumbers -and -not [System.Text.RegularExpressions.Regex]::IsMatch($password, "[0-9]")) -or ($requireUppercase -and -not [System.Text.RegularExpressions.Regex]::IsMatch($password, "[A-Z]")) -or ($requireLowercase -and -not [System.Text.RegularExpressions.Regex]::IsMatch($password, "[a-z]")))
+
+# Create user account 
+New-ADUser -Name $userName -FirstName $firstName -LastName $lastName -Department $department -AccountPassword (ConvertTo-SecureString $password -AsPlainText -Force) -Enabled $true
+
+# Add user to security groups 
+Add-ADGroupMember -Member $userName -GroupName "Domain Users"
+Add-ADGroupMember -Member $userName -GroupName "Employees"
+
+# (Optional) Create user mailbox 
+# New-Mailbox -Name $userName -DisplayName "$firstName $lastName" -SamAccountName $userName
+
+# Send welcome email with temporary password (if not using self-service password reset)
+# You'll need to configure your email server for this functionality
+
+Write-Host "User account $userName created successfully!"
+
+
