@@ -1,0 +1,26 @@
+# Define source folder path (replace with the path where user files are stored)
+$sourcePath = "C:\Users\Public\Documents"
+
+# Define target folder path (replace with the home directory path pattern)
+$homeDirPath = "\\fileserver\home$\%username%"
+
+# Get username (uncomment for testing, remove for scheduled task)
+#$userName = Read-Host "Enter username:"
+
+# Get current user name (use for scheduled task execution)
+$userName = $env:USERNAME
+
+# Define target path for the user (replace %username% with actual username)
+$userTargetPath = $homeDirPath -replace "%username%", $userName
+
+# Create target directory if it doesn't exist
+if (-not (Test-Path $userTargetPath)) {
+  New-Item -ItemType Directory -Path $userTargetPath
+  Write-Host "Home directory created: $userTargetPath"
+}
+
+# Copy files from source to target (replace -Force with -Move if you want to move files)
+Copy-Item -Path $sourcePath -Filter "*.*" -Destination $userTargetPath -Recurse -Force
+Write-Host "Files copied to home directory."
+
+Write-Host "User: $userName - File transfer completed."
